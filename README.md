@@ -11,3 +11,6 @@ This project uses tkinter to design the window interface, uses yfinance to captu
 First, execute the stock.py program, and an operation window will pop up. Then, enter the stock code you want to query in the window, and select the date range and chart type you want to view, including trend charts, K-line charts, and historical dividend charts. After completing the above settings, click the "Send" button to display the lowest and highest closing prices, highest and lowest prices, average trading volume and return rate during the date range you selected, as well as the stock information charts you need.
 
 In addition, if you want to save the query results as an image file, you can specify the storage path below the chart, and then click the "Save Chart" button to download the chart to your computer for subsequent use. The entire operation process is simple and convenient, allowing you to easily grasp the dynamics of the stock market.
+## Demo
+https://github.com/charley12009/Stock-Chart_in_tkinter/assets/76769844/5172d9dd-eada-426b-b380-0e7631d0e9fa
+
