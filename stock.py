@@ -7,7 +7,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import mplfinance as mpf
 import sys
 import matplotlib.dates as mdates
-import pandas as pd
 def download():
     selected_value = val.get()
     path = path_var.get()
