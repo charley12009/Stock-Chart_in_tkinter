@@ -3,6 +3,15 @@
 本專案使用tkinter設計視窗介面，使用yfinance抓取全球股票數據，使用matplotlib和mplfinance繪製股票相關圖表，如趨勢圖、K線圖、歷史股利等。
 
 This project uses tkinter to design the window interface, uses yfinance to capture global stock data, and uses matplotlib and mplfinance to draw stock-related charts, such as trend charts, K-line charts, and historical dividends.
+
+## Requiresment
+In requiresment.txt:
+'''
+tk==0.1.0
+tkcalender==1.6.1
+matplotlib==3.8.2
+mplfinance==0.12.10b0
+'''
 ## How to use
 首先,執行stock.py程式,將會彈出一個操作視窗。接著,在該視窗中輸入所欲查詢的股票代號,並選定想要查看的日期範圍及圖表類型,包括趨勢圖、K線圖以及歷史股利圖等。完成上述設定後,點選「送出」按鈕,即可呈現您選擇的日期範圍間的最低與最高收盤價、最高與最低價、平均成交量及報酬率，還有您所需的股票資訊圖表。
 
