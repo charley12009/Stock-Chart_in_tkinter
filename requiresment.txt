@@ -1,0 +1,5 @@
+tk==0.1.0
+tkcalender==1.6.1
+matplotlib==3.8.2
+mplfinance==0.12.10b0
+pandas==2.2.0
