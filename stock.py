@@ -7,6 +7,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import mplfinance as mpf
 import sys
 import matplotlib.dates as mdates
+from GoogleNews import GoogleNews
+from datetime import datetime
+
 def download():
     selected_value = val.get()
     path = path_var.get()
@@ -35,6 +38,17 @@ def download():
             start_date = start_date_entry.get_date()
             end_date = end_date_entry.get_date()
             plot_stock_div(symbol, start_date, end_date)
+        except IndexError:
+            error_message()
+    elif selected_value == 'n':
+        canva_clean()        
+        try:
+            symbol = symbol_entry.get()
+            # start_date = start_date_entry.get_date()
+            # end_date = end_date_entry.get_date()
+            start_date = start_date_entry.get_date().strftime('%Y-%m-%d')
+            end_date = end_date_entry.get_date().strftime('%Y-%m-%d')         
+            stock_news(symbol,start_date,end_date)
         except IndexError:
             error_message()
     else:
@@ -80,8 +94,7 @@ def plot_stock_div(symbol,start_date,end_date):
     
     # 選擇時間範圍
     df_new = stock_data[(stock_data.index > str(start_date)) & (stock_data.index < str(end_date))]
-    dividends= df_new['Dividends']
-    
+    dividends= df_new['Dividends']    
     df_new.info()
     stock_info(df_new)
     
@@ -91,16 +104,15 @@ def plot_stock_div(symbol,start_date,end_date):
     ax.bar(dividends.index, dividends)
     
     # 設置圖表標題和軸標籤
-    ax.set_title('Dividends')
+    ax.set_title(f'{symbol}')
     ax.set_xlabel('Date')
     ax.set_ylabel('Dividends')
-    # ax.legend()
 
     canvas = FigureCanvasTkAgg(fig,master=window)
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.grid(row=9,column=0,columnspan=2)
     
-    path_label = tk.Label(window,text="下載路徑：")
+    path_label = tk.Label(window,text="下載路徑：(不適用於股票新聞)")
     path_label.grid(row=10, column=0,columnspan=2) 
     path_entry = tk.Entry(window, textvariable=path_var, state='disabled', width=40)
     path_entry.grid(row=11, column=0,columnspan=2)
@@ -135,7 +147,7 @@ def plot_stock_trend_k(symbol, start_date, end_date):
     canvas = FigureCanvasTkAgg(fig, master=window)
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.grid(row=9, column=0,columnspan=2)
-    path_label = tk.Label(window,text="下載路徑：")
+    path_label = tk.Label(window,text="下載路徑：(不適用於股票新聞)")
     path_label.grid(row=10, column=0,columnspan=2) 
     path_entry = tk.Entry(window, textvariable=path_var, state='disabled', width=40)
     path_entry.grid(row=11, column=0,columnspan=2)
@@ -155,8 +167,7 @@ def plot_stock_trend(symbol,start_date,end_date):
     fig.set_size_inches(10, 4)
     ax.plot(df_new['Close'],label=symbol)    
     ax.set_title(f'{symbol}')
-    ax.set_xlabel('Date')
-    
+    ax.set_xlabel('Date')    
     ax.set_ylabel('Closing Price')
     ax.legend()
 
@@ -164,7 +175,7 @@ def plot_stock_trend(symbol,start_date,end_date):
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.grid(row=9,column=0,columnspan=2)
     
-    path_label = tk.Label(window,text="下載路徑：")
+    path_label = tk.Label(window,text="下載路徑：(不適用於股票新聞)")
     path_label.grid(row=10, column=0,columnspan=2) 
     path_entry = tk.Entry(window, textvariable=path_var, state='disabled', width=40)
     path_entry.grid(row=11, column=0,columnspan=2)
@@ -182,6 +193,33 @@ def save_figure(fig, symbol, chart_type):
         tk.messagebox.showinfo(title='成功', message='圖表已儲存至指定路徑')
     except Exception as e:
         tk.messagebox.showerror(title='錯誤', message=f'儲存圖表失敗：{e}')
+
+def stock_news(symbol, start_date, end_date):
+    start_date = datetime.strptime(start_date, '%Y-%m-%d').strftime('%m/%d/%Y')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d').strftime('%m/%d/%Y')
+    print(f'{symbol}')
+    googlenews = GoogleNews(lang='zh-tw', region='US', start=start_date, end=end_date)
+    googlenews.enableException(True)
+    googlenews.get_news(f'{symbol}')
+    re_text = googlenews.get_texts()
+    re_link = googlenews.get_links()
+    if re_text:
+        # 清除舊的 Canvas
+        canva_clean()
+        
+        # 創建一個文本框來顯示新聞結果
+        news_text = tk.Text(window, wrap="word", height=20, width=80)
+        news_text.grid(row=9, column=0, columnspan=2)
+        
+        # 將新聞結果添加到文本框中
+        for text, link in zip(re_text, re_link):
+            news_text.insert(tk.END, f"{text}\n{link}\n\n")
+            # 標記文字
+            news_text.tag_add("text", "insert-2l", "insert-1l")
+            news_text.tag_config("text", foreground="green")  # 更改文字顏色
+        news_text.config(state=tk.DISABLED)  # 設置文本框為不可編輯狀態        
+    else:
+        tk.messagebox.showinfo(title='提示', message='找不到相關新聞')
 window = tk.Tk()
 window.title('全球股價趨勢')
 
@@ -212,7 +250,9 @@ radio_btn_tr.select()
 radio_btn_k = tk.Radiobutton(window, text='k線圖',variable=val, value='k')
 radio_btn_k.grid(row=3, column=1) # 4 0
 radio_btn_d = tk.Radiobutton(window, text='歷史股利',variable=val, value='d')
-radio_btn_d.grid(row=4, column=0,columnspan=2) # 5 0
+radio_btn_d.grid(row=4, column=0) # 5 0
+radio_btn_d = tk.Radiobutton(window, text='股票新聞',variable=val, value='n')
+radio_btn_d.grid(row=4, column=1) # 5 0
 min_close_labels = ttk.Label(master=window,text='')
 min_close_labels.grid(row=5,column=0)  # 4 0
 max_close_labels = ttk.Label(master=window,text='')
